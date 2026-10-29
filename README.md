@@ -60,3 +60,9 @@ python3 tests/static.py
 Размещение, cron, SMTP, Telegram, SSH и восстановление: [docs/deployment.md](docs/deployment.md).
 
 Браузерные проверки: `npm install --no-save --package-lock=false playwright` (или установленный Playwright), `CHROMIUM_PATH=/usr/bin/chromium node tests/browser.cjs`; требуется запущенный локальный сайт и APP_ORIGIN=http://localhost:8080. Тесты проверяют 360/768/1440px и демоформу. В этой облачной среде Composer установлен через `--prefer-source` с разрешённых официальных Git-репозиториев; на обычном хостинге подходит стандартный `composer install` из lockfile.
+
+## Предпросмотр на GitHub Pages
+
+Workflow `GitHub Pages preview` собирает отдельный статический предпросмотр и публикует его при push в main или ручном запуске. Если автоматическое включение Pages запрещено настройками GitHub, владелец должен выбрать **Settings → Pages → Source → GitHub Actions**, затем перезапустить workflow во вкладке Actions. Ожидаемый адрес после успешной публикации: https://sebbamaro.github.io/banner-company-site/.
+
+В preview форма визуально присутствует, поля и отправка отключены; PHP, серверные настройки, зависимости и заявки в артефакт не входят. Метрика отключена, индексация запрещена. Это просмотр дизайна, а не production-размещение сервиса заявок. Локальная сборка: `python3 bin/build-pages.py`; результат в игнорируемой папке `dist-pages`. Production-инструкции российского хостинга остаются отдельными.
