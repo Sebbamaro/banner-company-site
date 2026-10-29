@@ -20,13 +20,14 @@ docker compose exec app php bin/migrate.php
 ## Проверки
 
 ```sh
+docker compose exec db mariadb -uroot -plocal-only-root -e "CREATE DATABASE IF NOT EXISTS banner_test"
 docker compose exec app php tests/run.php
 docker compose exec app php tests/integration.php
 docker compose exec app php tests/http.php
 python3 tests/static.py
 ```
 
-Интеграционный тест создаёт и удаляет отдельную базу `banner_test`, требуется root-доступ только к локальной тестовой БД. Никогда не запускать на production. `TEST_DB_DSN`, `TEST_DB_USER`, `TEST_DB_PASSWORD` задают отдельную тестовую БД; имя должно оканчиваться на `_test`.
+Команда выше создаёт отдельную базу `banner_test`; интеграционный тест очищает её тестовые записи, требуется root-доступ только к локальной тестовой БД. Никогда не запускать на production. `TEST_DB_DSN`, `TEST_DB_USER`, `TEST_DB_PASSWORD` задают отдельную тестовую БД; имя должно оканчиваться на `_test`.
 
 ## Что заполнить перед публикацией
 
