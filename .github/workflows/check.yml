@@ -1,0 +1,32 @@
+name: Checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: local-only-root
+          MARIADB_DATABASE: banner_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, mbstring, curl
+      - run: composer install --no-interaction --prefer-dist
+      - run: php tests/run.php
+      - run: php tests/integration.php
+        env:
+          TEST_DB_DSN: mysql:host=127.0.0.1;dbname=banner_test;charset=utf8mb4
+      - run: php tests/http.php
+        env:
+          TEST_DB_DSN: mysql:host=127.0.0.1;dbname=banner_test;charset=utf8mb4
+      - run: python3 tests/static.py

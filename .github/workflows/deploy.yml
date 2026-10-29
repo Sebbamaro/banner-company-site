@@ -1,0 +1,30 @@
+name: Manual deployment
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency: production-deploy
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure verified SSH
+        env:
+          KEY: ${{ secrets.DEPLOY_KEY }}
+          KNOWN: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/*
+      - name: Upload non-secret release files
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+          PORT: ${{ secrets.DEPLOY_PORT }}
+          TARGET: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          test -n "$HOST" && test -n "$USER" && test -n "$TARGET" && test -n "$PORT"
+          rsync -az -e "ssh -p $PORT -o StrictHostKeyChecking=yes" public src bin config migrations composer.json composer.lock "$USER@$HOST:$TARGET/"

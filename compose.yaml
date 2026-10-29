@@ -1,0 +1,28 @@
+services:
+  app:
+    build: .
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - '127.0.0.1:8080:8080'
+    command: php -S 0.0.0.0:8080 -t public
+    environment:
+      DB_DSN: mysql:host=db;dbname=banner;charset=utf8mb4
+      DB_USER: banner
+      DB_PASSWORD: local-only-password
+  db:
+    image: mariadb:11.4
+    environment:
+      MARIADB_DATABASE: banner
+      MARIADB_USER: banner
+      MARIADB_PASSWORD: local-only-password
+      MARIADB_ROOT_PASSWORD: local-only-root
+    volumes:
+      - database:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 3s
+      retries: 30
+volumes:
+  database:
